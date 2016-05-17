@@ -13,6 +13,45 @@ Install
 
 ```
 $ pip install mock-open
+
+```
+Quickstart
+----------
+
+```
+# file_to_test.py
+
+def count_lines_in_file_and_convert_to_array():
+    with open("path_to_file.json", "r") as file:
+        output = []
+        num_lines = sum(1 for line in file)
+        file.seek(0)
+        for line in file.readlines():
+            output.append(line.strip("\n"))
+    return num_lines, output
+```
+
+```
+# test.py
+
+import mock
+from mock_open import MockOpen
+import unittest
+
+from file_to_test import count_lines_in_file_and_convert_to_array
+
+
+class MockOpenTest(unittest.TestCase):
+    test_input = ["First line of file", "Second line of file"]
+
+    @mock.patch("file_to_test.open", new=MockOpen(read_data="\n".join(test_input)))
+    def test_count_lines_in_file_and_convert_to_array(self):
+        num_lines, test_output = count_lines_in_file_and_convert_to_array()
+        self.assertEqual(num_lines, 2)
+        self.assertEqual(test_output, self.test_input)
+
+if __name__=="__main__":
+    unittest.main()
 ```
 
 class `MockOpen`
